@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { ProjectSelector } from '@/components/project-selector';
+import { StoreMenu } from '@/components/store-menu';
 import { TaskFormDialog } from '@/components/task-form-dialog';
 import { TaskTable } from '@/components/task-table';
 import { TaskViewDialog } from '@/components/task-view-dialog';
@@ -63,8 +64,9 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 flex items-center justify-between">
             <h1 className="text-3xl font-bold">Task Manager</h1>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <ProjectSelector />
+              <StoreMenu />
               <Button onClick={handleOpenCreateTask}>
                 <Plus className="mr-2 h-4 w-4" /> Add Task
               </Button>
