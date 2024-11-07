@@ -1,3 +1,4 @@
+import { arrayMove } from '@dnd-kit/sortable';
 import { z } from 'zod';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -25,6 +26,7 @@ export const taskSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   archived: z.boolean(),
+  order: z.number().default(0),
 });
 
 export type Project = z.infer<typeof projectSchema>;
@@ -48,6 +50,7 @@ interface TaskStore {
   deleteTask: (id: string) => void;
   deleteProject: (id: string) => void;
   canDeleteProject: (id: string) => boolean;
+  reorderTasks: (activeId: string, overId: string) => void;
 }
 
 export const useTaskStore = create<TaskStore>()(
@@ -128,6 +131,15 @@ export const useTaskStore = create<TaskStore>()(
         const state = get();
         return !state.tasks.some(task => task.projectId === id);
       },
+      reorderTasks: (activeId, overId) =>
+        set(state => {
+          const oldIndex = state.tasks.findIndex(task => task.id === activeId);
+          const newIndex = state.tasks.findIndex(task => task.id === overId);
+
+          return {
+            tasks: arrayMove(state.tasks, oldIndex, newIndex),
+          };
+        }),
     }),
     {
       name: 'task-store',
