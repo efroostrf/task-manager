@@ -1,11 +1,7 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-
-import { useForm } from 'react-hook-form';
-
 import { toast } from 'sonner';
 
 import { ProjectSelector } from '@/components/project-selector';
@@ -13,9 +9,8 @@ import { TaskFormDialog } from '@/components/task-form-dialog';
 import { TaskTable } from '@/components/task-table';
 import { TaskViewDialog } from '@/components/task-view-dialog';
 import { Button } from '@/components/ui/button';
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTaskStore, taskSchema, type Task } from '@/lib/store';
+import { useTaskStore, type Task } from '@/lib/store';
 
 export default function Home() {
   const { tasks, projects, selectedProjectId, archiveTask, unarchiveTask } =
@@ -24,19 +19,6 @@ export default function Home() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const { reset, setValue } = useForm<
-    Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'archived'>
-  >({
-    resolver: zodResolver(
-      taskSchema.omit({
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        archived: true,
-      }),
-    ),
-  });
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);
 
@@ -52,24 +34,19 @@ export default function Home() {
       task.archived,
   );
 
-  const handleCloseForm = () => {
-    setIsFormOpen(false);
-    reset({
-      name: '',
-      description: '',
-      status: 'pending',
-      projectId: '',
-    });
+  const handleOpenCreateTask = () => {
     setSelectedTask(null);
+    setIsFormOpen(true);
   };
 
   const handleEdit = (task: Task) => {
     setSelectedTask(task);
-    setValue('name', task.name);
-    setValue('description', task.description);
-    setValue('status', task.status);
-    setValue('projectId', task.projectId);
     setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setSelectedTask(null);
   };
 
   const handleArchive = (id: string) => {
@@ -91,7 +68,7 @@ export default function Home() {
           </h1>
           <div className="flex items-center gap-4">
             <ProjectSelector />
-            <Button onClick={() => setIsFormOpen(true)}>
+            <Button onClick={handleOpenCreateTask}>
               <Plus className="mr-2 h-4 w-4" /> Add Task
             </Button>
           </div>
