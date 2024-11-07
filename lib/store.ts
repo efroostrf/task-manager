@@ -144,10 +144,12 @@ export const useTaskStore = create<TaskStore>()(
       }),
       onRehydrateStorage: () => state => {
         if (state) {
+          // eslint-disable-next-line no-param-reassign
           state.projects = state.projects.map(project => ({
             ...project,
             createdAt: new Date(project.createdAt),
           }));
+          // eslint-disable-next-line no-param-reassign
           state.tasks = state.tasks.map(task => ({
             ...task,
             createdAt: new Date(task.createdAt),

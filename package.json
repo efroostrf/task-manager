@@ -1,7 +1,19 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "@yefro/task-manager",
+  "version": "1.0.0",
+  "description": "Simple and efficient task management application",
   "private": true,
+  "author": {
+    "name": "Yefrosynii Kolenko",
+    "email": "contact@yefro.dev",
+    "url": "https://www.yefro.dev"
+  },
+  "homepage": "https://www.yefro.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/efroostrf/task-manager"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
