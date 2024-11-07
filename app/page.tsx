@@ -147,7 +147,7 @@ export default function Home() {
               <span className="text-sm text-muted-foreground">
                 Released under the{' '}
                 <a
-                  href="https://github.com/efroostrf/task-manager/blob/main/LICENSE"
+                  href="https://github.com/efroostrf/task-manager/blob/master/LICENSE"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline-offset-4 hover:underline"

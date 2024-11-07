@@ -9,8 +9,6 @@ A simple and efficient task management application built with Next.js, TypeScrip
 - 📊 Track task status and progress
 - 🗂️ Archive completed tasks
 - 💾 Persistent storage
-- 📱 Responsive design
-- 🌙 Dark mode support
 
 ## Getting Started
 
