@@ -46,11 +46,13 @@ interface TaskStore {
   archiveTask: (id: string) => void;
   unarchiveTask: (id: string) => void;
   deleteTask: (id: string) => void;
+  deleteProject: (id: string) => void;
+  canDeleteProject: (id: string) => boolean;
 }
 
 export const useTaskStore = create<TaskStore>()(
   persist(
-    set => ({
+    (set, get) => ({
       projects: [],
       tasks: [],
       selectedProjectId: null,
@@ -111,6 +113,21 @@ export const useTaskStore = create<TaskStore>()(
         set(state => ({
           tasks: state.tasks.filter(task => task.id !== id),
         })),
+      deleteProject: id =>
+        set(state => {
+          const hasNoTasks = !state.tasks.some(task => task.projectId === id);
+          if (!hasNoTasks) return state;
+
+          return {
+            projects: state.projects.filter(project => project.id !== id),
+            selectedProjectId:
+              state.selectedProjectId === id ? null : state.selectedProjectId,
+          };
+        }),
+      canDeleteProject: id => {
+        const state = get();
+        return !state.tasks.some(task => task.projectId === id);
+      },
     }),
     {
       name: 'task-store',

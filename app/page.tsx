@@ -13,14 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTaskStore, type Task } from '@/lib/store';
 
 export default function Home() {
-  const { tasks, projects, selectedProjectId, archiveTask, unarchiveTask } =
+  const { tasks, selectedProjectId, archiveTask, unarchiveTask } =
     useTaskStore();
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   const filteredTasks = tasks.filter(
     task =>
@@ -63,9 +61,7 @@ export default function Home() {
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold">
-            {selectedProject ? selectedProject.name : 'Task Manager'}
-          </h1>
+          <h1 className="text-3xl font-bold">Task Manager</h1>
           <div className="flex items-center gap-4">
             <ProjectSelector />
             <Button onClick={handleOpenCreateTask}>
