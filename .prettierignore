@@ -1,0 +1,16 @@
+# compiled output
+/dist
+.next
+
+# Ignore artifacts:
+build
+coverage
+documentation
+logs
+node_modules
+
+# Ignore all HTML files:
+*.html
+.gitignore
+.prettierignore
+.husky

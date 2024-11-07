@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { format } from "date-fns";
-import { Eye, Pencil, Archive, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { format } from 'date-fns';
+import { Eye, Pencil, Archive, RotateCcw } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -10,8 +11,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Task, useTaskStore } from "@/lib/store";
+} from '@/components/ui/table';
+import { type Task, useTaskStore } from '@/lib/store';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -21,11 +22,17 @@ interface TaskTableProps {
   onUnarchive?: (id: string) => void;
 }
 
-export function TaskTable({ tasks, onView, onEdit, onArchive, onUnarchive }: TaskTableProps) {
-  const projects = useTaskStore((state) => state.projects);
+export function TaskTable({
+  tasks,
+  onView,
+  onEdit,
+  onArchive,
+  onUnarchive,
+}: TaskTableProps) {
+  const projects = useTaskStore(state => state.projects);
 
   return (
-    <div className="bg-card rounded-lg shadow-lg overflow-hidden">
+    <div className="overflow-hidden rounded-lg bg-card shadow-lg">
       <Table>
         <TableHeader>
           <TableRow>
@@ -38,27 +45,27 @@ export function TaskTable({ tasks, onView, onEdit, onArchive, onUnarchive }: Tas
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.map((task) => (
+          {tasks.map(task => (
             <TableRow key={task.id}>
               <TableCell className="font-medium">{task.name}</TableCell>
               <TableCell>
-                {projects.find((p) => p.id === task.projectId)?.name}
+                {projects.find(p => p.id === task.projectId)?.name}
               </TableCell>
               <TableCell>
                 <span
-                  className={`capitalize px-2 py-1 rounded-full text-sm ${
-                    task.status === "completed"
-                      ? "bg-green-100 text-green-800"
-                      : task.status === "in-progress"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-yellow-100 text-yellow-800"
+                  className={`rounded-full px-2 py-1 text-sm capitalize ${
+                    task.status === 'completed'
+                      ? 'bg-green-100 text-green-800'
+                      : task.status === 'in-progress'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
                   }`}
                 >
                   {task.status}
                 </span>
               </TableCell>
-              <TableCell>{format(task.createdAt, "PPp")}</TableCell>
-              <TableCell>{format(task.updatedAt, "PPp")}</TableCell>
+              <TableCell>{format(task.createdAt, 'PPp')}</TableCell>
+              <TableCell>{format(task.updatedAt, 'PPp')}</TableCell>
               <TableCell className="text-right">
                 <Button
                   variant="ghost"

@@ -1,41 +1,46 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+
+import { useForm } from 'react-hook-form';
+
+import { toast } from 'sonner';
+
+import { ProjectSelector } from '@/components/project-selector';
+import { TaskTable } from '@/components/task-table';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { Plus } from "lucide-react";
-import { useTaskStore, taskSchema, type Task } from "@/lib/store";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { format } from "date-fns";
-import { ProjectSelector } from "@/components/project-selector";
-import { TaskTable } from "@/components/task-table";
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { useTaskStore, taskSchema, type Task } from '@/lib/store';
 
 export default function Home() {
-  const { tasks, projects, selectedProjectId, addTask, updateTask, archiveTask, unarchiveTask } =
-    useTaskStore();
+  const {
+    tasks,
+    projects,
+    selectedProjectId,
+    addTask,
+    updateTask,
+    archiveTask,
+    unarchiveTask,
+  } = useTaskStore();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -46,35 +51,40 @@ export default function Home() {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<Omit<Task, "id" | "createdAt" | "updatedAt" | "archived">>({
+  } = useForm<Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'archived'>>({
     resolver: zodResolver(
-      taskSchema.omit({ id: true, createdAt: true, updatedAt: true, archived: true })
+      taskSchema.omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        archived: true,
+      }),
     ),
   });
 
-  const selectedProject = projects.find((p) => p.id === selectedProjectId);
+  const selectedProject = projects.find(p => p.id === selectedProjectId);
 
   const filteredTasks = tasks.filter(
-    (task) =>
+    task =>
       (!selectedProjectId || task.projectId === selectedProjectId) &&
-      !task.archived
+      !task.archived,
   );
 
   const archivedTasks = tasks.filter(
-    (task) =>
+    task =>
       (!selectedProjectId || task.projectId === selectedProjectId) &&
-      task.archived
+      task.archived,
   );
 
   const onSubmit = (
-    data: Omit<Task, "id" | "createdAt" | "updatedAt" | "archived">
+    data: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'archived'>,
   ) => {
     if (selectedTask) {
       updateTask(selectedTask.id, data);
-      toast.success("Task updated successfully");
+      toast.success('Task updated successfully');
     } else {
       addTask(data);
-      toast.success("Task added successfully");
+      toast.success('Task added successfully');
     }
     handleCloseForm();
   };
@@ -82,39 +92,39 @@ export default function Home() {
   const handleCloseForm = () => {
     setIsFormOpen(false);
     reset({
-      name: "",
-      description: "",
-      status: "pending",
-      projectId: "",
+      name: '',
+      description: '',
+      status: 'pending',
+      projectId: '',
     });
     setSelectedTask(null);
   };
 
   const handleEdit = (task: Task) => {
     setSelectedTask(task);
-    setValue("name", task.name);
-    setValue("description", task.description);
-    setValue("status", task.status);
-    setValue("projectId", task.projectId);
+    setValue('name', task.name);
+    setValue('description', task.description);
+    setValue('status', task.status);
+    setValue('projectId', task.projectId);
     setIsFormOpen(true);
   };
 
   const handleArchive = (id: string) => {
     archiveTask(id);
-    toast.success("Task archived successfully");
+    toast.success('Task archived successfully');
   };
 
   const handleUnarchive = (id: string) => {
     unarchiveTask(id);
-    toast.success("Task restored successfully");
+    toast.success('Task restored successfully');
   };
 
   return (
     <div className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex items-center justify-between">
           <h1 className="text-3xl font-bold">
-            {selectedProject ? selectedProject.name : "Task Manager"}
+            {selectedProject ? selectedProject.name : 'Task Manager'}
           </h1>
           <div className="flex items-center gap-4">
             <ProjectSelector />
@@ -133,7 +143,7 @@ export default function Home() {
           <TabsContent value="active">
             <TaskTable
               tasks={filteredTasks}
-              onView={(task) => {
+              onView={task => {
                 setSelectedTask(task);
                 setIsViewOpen(true);
               }}
@@ -145,7 +155,7 @@ export default function Home() {
           <TabsContent value="archived">
             <TaskTable
               tasks={archivedTasks}
-              onView={(task) => {
+              onView={task => {
                 setSelectedTask(task);
                 setIsViewOpen(true);
               }}
@@ -160,21 +170,23 @@ export default function Home() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {selectedTask ? "Edit Task" : "Add New Task"}
+                {selectedTask ? 'Edit Task' : 'Add New Task'}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="projectId">Project</Label>
                 <Select
-                  onValueChange={(value) => setValue("projectId", value)}
-                  defaultValue={selectedTask?.projectId || selectedProjectId || undefined}
+                  onValueChange={value => setValue('projectId', value)}
+                  defaultValue={
+                    selectedTask?.projectId ?? selectedProjectId ?? undefined
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select project" />
                   </SelectTrigger>
                   <SelectContent>
-                    {projects.map((project) => (
+                    {projects.map(project => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
                       </SelectItem>
@@ -184,14 +196,16 @@ export default function Home() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" {...register("name")} />
+                <Input id="name" {...register('name')} />
                 {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
-                <Textarea id="description" {...register("description")} />
+                <Textarea id="description" {...register('description')} />
                 {errors.description && (
                   <p className="text-sm text-destructive">
                     {errors.description.message}
@@ -201,10 +215,10 @@ export default function Home() {
               <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
                 <Select
-                  onValueChange={(value) =>
-                    setValue("status", value as Task["status"])
+                  onValueChange={value =>
+                    setValue('status', value as Task['status'])
                   }
-                  defaultValue={selectedTask?.status || "pending"}
+                  defaultValue={selectedTask?.status ?? 'pending'}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -225,7 +239,7 @@ export default function Home() {
                   Cancel
                 </Button>
                 <Button type="submit">
-                  {selectedTask ? "Update" : "Create"} Task
+                  {selectedTask ? 'Update' : 'Create'} Task
                 </Button>
               </div>
             </form>
@@ -241,9 +255,7 @@ export default function Home() {
               <div>
                 <h3 className="font-medium">Project</h3>
                 <p className="text-muted-foreground">
-                  {
-                    projects.find((p) => p.id === selectedTask?.projectId)?.name
-                  }
+                  {projects.find(p => p.id === selectedTask?.projectId)?.name}
                 </p>
               </div>
               <div>
@@ -252,13 +264,13 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="font-medium">Description</h3>
-                <p className="text-muted-foreground whitespace-pre-wrap">
+                <p className="whitespace-pre-wrap text-muted-foreground">
                   {selectedTask?.description}
                 </p>
               </div>
               <div>
                 <h3 className="font-medium">Status</h3>
-                <p className="text-muted-foreground capitalize">
+                <p className="capitalize text-muted-foreground">
                   {selectedTask?.status}
                 </p>
               </div>
@@ -267,14 +279,14 @@ export default function Home() {
                   <h3 className="font-medium">Created At</h3>
                   <p className="text-muted-foreground">
                     {selectedTask?.createdAt &&
-                      format(selectedTask.createdAt, "PPp")}
+                      format(selectedTask.createdAt, 'PPp')}
                   </p>
                 </div>
                 <div>
                   <h3 className="font-medium">Updated At</h3>
                   <p className="text-muted-foreground">
                     {selectedTask?.updatedAt &&
-                      format(selectedTask.updatedAt, "PPp")}
+                      format(selectedTask.updatedAt, 'PPp')}
                   </p>
                 </div>
               </div>

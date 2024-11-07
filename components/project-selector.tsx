@@ -1,52 +1,56 @@
-"use client";
+'use client';
 
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus } from 'lucide-react';
+
+import { useState } from 'react';
+
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useTaskStore } from "@/lib/store";
-import { toast } from "sonner";
+} from '@/components/ui/select';
+import { useTaskStore } from '@/lib/store';
 
 export function ProjectSelector() {
-  const { projects, selectedProjectId, addProject, selectProject } = useTaskStore();
+  const { projects, selectedProjectId, addProject, selectProject } =
+    useTaskStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [newProjectName, setNewProjectName] = useState("");
+  const [newProjectName, setNewProjectName] = useState('');
 
   const handleCreateProject = () => {
     if (newProjectName.trim()) {
       addProject(newProjectName.trim());
-      setNewProjectName("");
+      setNewProjectName('');
       setIsOpen(false);
-      toast.success("Project created successfully");
+      toast.success('Project created successfully');
     }
   };
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex items-center gap-2">
       <Select
-        value={selectedProjectId || "all"}
-        onValueChange={(value) => selectProject(value === "all" ? null : value)}
+        value={selectedProjectId || 'all'}
+        onValueChange={value => selectProject(value === 'all' ? null : value)}
       >
         <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Select a project" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Projects</SelectItem>
-          {projects.map((project) => (
+          {projects.map(project => (
             <SelectItem key={project.id} value={project.id}>
               {project.name}
             </SelectItem>
@@ -69,7 +73,7 @@ export function ProjectSelector() {
               <Input
                 id="projectName"
                 value={newProjectName}
-                onChange={(e) => setNewProjectName(e.target.value)}
+                onChange={e => setNewProjectName(e.target.value)}
                 placeholder="Enter project name"
               />
             </div>
@@ -78,7 +82,7 @@ export function ProjectSelector() {
                 variant="outline"
                 onClick={() => {
                   setIsOpen(false);
-                  setNewProjectName("");
+                  setNewProjectName('');
                 }}
               >
                 Cancel
