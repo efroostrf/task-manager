@@ -1,21 +1,28 @@
 'use client';
 
-import { Download, Menu, Upload } from 'lucide-react';
+import { Download, Menu, Upload, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { ProjectFormDialog } from '@/components/project-form-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type Project, type Task, useTaskStore } from '@/lib/store';
 
 export function StoreMenu() {
   const [, setImporting] = useState(false);
+  const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const store = useTaskStore();
+  const selectedProject = store.projects.find(
+    p => p.id === store.selectedProjectId,
+  );
 
   const handleExport = () => {
     try {
@@ -89,35 +96,86 @@ export function StoreMenu() {
     }
   };
 
+  const handleDeleteProject = () => {
+    if (!store.selectedProjectId) return;
+
+    if (!store.canDeleteProject(store.selectedProjectId)) {
+      toast.error('Cannot delete project with existing tasks');
+      return;
+    }
+
+    store.deleteProject(store.selectedProjectId);
+    toast.success('Project deleted successfully');
+  };
+
+  const handleNewProject = () => {
+    setEditingProject(null);
+    setIsProjectFormOpen(true);
+  };
+
+  const handleEditProject = () => {
+    setEditingProject(selectedProject ?? null);
+    setIsProjectFormOpen(true);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Menu className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleExport}>
-          <Download className="mr-2 h-4 w-4" />
-          Export Data
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onSelect={e => {
-            e.preventDefault();
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = event =>
-              handleImport(
-                event as unknown as React.ChangeEvent<HTMLInputElement>,
-              );
-            input.click();
-          }}
-        >
-          <Upload className="mr-2 h-4 w-4" />
-          Import Data
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon">
+            <Menu className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={handleNewProject}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Project
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!selectedProject}
+            onClick={handleEditProject}
+          >
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit Project
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={
+              !selectedProject || !store.canDeleteProject(selectedProject.id)
+            }
+            onClick={handleDeleteProject}
+          >
+            <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+            Delete Project
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleExport}>
+            <Download className="mr-2 h-4 w-4" />
+            Export Data
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={e => {
+              e.preventDefault();
+              const input = document.createElement('input');
+              input.type = 'file';
+              input.accept = '.json';
+              input.onchange = event =>
+                handleImport(
+                  event as unknown as React.ChangeEvent<HTMLInputElement>,
+                );
+              input.click();
+            }}
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Import Data
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <ProjectFormDialog
+        open={isProjectFormOpen}
+        onOpenChange={setIsProjectFormOpen}
+        project={editingProject ?? undefined}
+      />
+    </>
   );
 }
