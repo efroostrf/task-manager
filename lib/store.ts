@@ -1,10 +1,11 @@
+import { z } from 'zod';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { z } from 'zod';
 
 export const projectSchema = z.object({
   id: z.string(),
   name: z.string().min(1, 'Project name is required'),
+  color: z.string().default('sky'),
   createdAt: z.date(),
 });
 
@@ -13,7 +14,14 @@ export const taskSchema = z.object({
   projectId: z.string(),
   name: z.string().min(1, 'Name is required'),
   description: z.string().min(1, 'Description is required'),
-  status: z.enum(['pending', 'in-progress', 'completed']),
+  status: z.enum([
+    'draft',
+    'pending',
+    'in-progress',
+    'completed',
+    'on-hold',
+    'cancelled',
+  ]),
   createdAt: z.date(),
   updatedAt: z.date(),
   archived: z.boolean(),
@@ -26,10 +34,15 @@ interface TaskStore {
   projects: Project[];
   tasks: Task[];
   selectedProjectId: string | null;
-  addProject: (name: string) => void;
+  addProject: (name: string, color: string) => void;
   selectProject: (projectId: string | null) => void;
-  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'archived'>) => void;
-  updateTask: (id: string, task: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>>) => void;
+  addTask: (
+    task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'archived'>,
+  ) => void;
+  updateTask: (
+    id: string,
+    task: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>>,
+  ) => void;
   archiveTask: (id: string) => void;
   unarchiveTask: (id: string) => void;
   deleteTask: (id: string) => void;
@@ -37,27 +50,28 @@ interface TaskStore {
 
 export const useTaskStore = create<TaskStore>()(
   persist(
-    (set) => ({
+    set => ({
       projects: [],
       tasks: [],
       selectedProjectId: null,
-      addProject: (name) =>
-        set((state) => ({
+      addProject: (name, color) =>
+        set(state => ({
           projects: [
             ...state.projects,
             {
               id: crypto.randomUUID(),
               name,
+              color,
               createdAt: new Date(),
             },
           ],
         })),
-      selectProject: (projectId) =>
+      selectProject: projectId =>
         set(() => ({
           selectedProjectId: projectId,
         })),
-      addTask: (task) =>
-        set((state) => ({
+      addTask: task =>
+        set(state => ({
           tasks: [
             ...state.tasks,
             {
@@ -70,60 +84,60 @@ export const useTaskStore = create<TaskStore>()(
           ],
         })),
       updateTask: (id, updatedTask) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
+        set(state => ({
+          tasks: state.tasks.map(task =>
             task.id === id
               ? { ...task, ...updatedTask, updatedAt: new Date() }
-              : task
+              : task,
           ),
         })),
-      archiveTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
+      archiveTask: id =>
+        set(state => ({
+          tasks: state.tasks.map(task =>
             task.id === id
               ? { ...task, archived: true, updatedAt: new Date() }
-              : task
+              : task,
           ),
         })),
-      unarchiveTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
+      unarchiveTask: id =>
+        set(state => ({
+          tasks: state.tasks.map(task =>
             task.id === id
               ? { ...task, archived: false, updatedAt: new Date() }
-              : task
+              : task,
           ),
         })),
-      deleteTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== id),
+      deleteTask: id =>
+        set(state => ({
+          tasks: state.tasks.filter(task => task.id !== id),
         })),
     }),
     {
       name: 'task-store',
-      partialize: (state) => ({
+      partialize: state => ({
         projects: state.projects.map(project => ({
           ...project,
-          createdAt: project.createdAt.toISOString()
+          createdAt: project.createdAt.toISOString(),
         })),
         tasks: state.tasks.map(task => ({
           ...task,
           createdAt: task.createdAt.toISOString(),
-          updatedAt: task.updatedAt.toISOString()
-        }))
+          updatedAt: task.updatedAt.toISOString(),
+        })),
       }),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         if (state) {
           state.projects = state.projects.map(project => ({
             ...project,
-            createdAt: new Date(project.createdAt)
+            createdAt: new Date(project.createdAt),
           }));
           state.tasks = state.tasks.map(task => ({
             ...task,
             createdAt: new Date(task.createdAt),
-            updatedAt: new Date(task.updatedAt)
+            updatedAt: new Date(task.updatedAt),
           }));
         }
-      }
-    }
-  )
+      },
+    },
+  ),
 );

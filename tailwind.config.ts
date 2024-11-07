@@ -87,5 +87,11 @@ const config: Config = {
   },
   // eslint-disable-next-line global-require
   plugins: [require('tailwindcss-animate')],
+  safelist: [
+    {
+      pattern:
+        /bg-(slate|gray|zinc|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-500/,
+    },
+  ],
 };
 export default config;

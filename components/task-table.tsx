@@ -22,6 +22,15 @@ interface TaskTableProps {
   onUnarchive?: (id: string) => void;
 }
 
+const STATUS_STYLES = {
+  draft: 'bg-gray-100 text-gray-800',
+  pending: 'bg-yellow-100 text-yellow-800',
+  'in-progress': 'bg-blue-100 text-blue-800',
+  completed: 'bg-green-100 text-green-800',
+  'on-hold': 'bg-orange-100 text-orange-800',
+  cancelled: 'bg-red-100 text-red-800',
+} as const;
+
 export function TaskTable({
   tasks,
   onView,
@@ -45,62 +54,68 @@ export function TaskTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.map(task => (
-            <TableRow key={task.id}>
-              <TableCell className="font-medium">{task.name}</TableCell>
-              <TableCell>
-                {projects.find(p => p.id === task.projectId)?.name}
-              </TableCell>
-              <TableCell>
-                <span
-                  className={`rounded-full px-2 py-1 text-sm capitalize ${
-                    task.status === 'completed'
-                      ? 'bg-green-100 text-green-800'
-                      : task.status === 'in-progress'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                  }`}
-                >
-                  {task.status}
-                </span>
-              </TableCell>
-              <TableCell>{format(task.createdAt, 'PPp')}</TableCell>
-              <TableCell>{format(task.updatedAt, 'PPp')}</TableCell>
-              <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onView(task)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(task)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                {task.archived && onUnarchive ? (
+          {tasks.map(task => {
+            const project = projects.find(p => p.id === task.projectId);
+            return (
+              <TableRow key={task.id}>
+                <TableCell className="font-medium">{task.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {project && (
+                      <div
+                        className={`h-3 w-3 rounded-full bg-${project.color}-500`}
+                      />
+                    )}
+                    {project?.name}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span
+                    className={`inline-block rounded-full px-2 py-1 text-sm capitalize ${
+                      STATUS_STYLES[task.status]
+                    }`}
+                  >
+                    {task.status}
+                  </span>
+                </TableCell>
+                <TableCell>{format(task.createdAt, 'PPp')}</TableCell>
+                <TableCell>{format(task.updatedAt, 'PPp')}</TableCell>
+                <TableCell className="text-right">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onUnarchive(task.id)}
+                    onClick={() => onView(task)}
                   >
-                    <RotateCcw className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </Button>
-                ) : (
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onArchive(task.id)}
+                    onClick={() => onEdit(task)}
                   >
-                    <Archive className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   </Button>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
+                  {task.archived && onUnarchive ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onUnarchive(task.id)}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onArchive(task.id)}
+                    >
+                      <Archive className="h-4 w-4" />
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
           {tasks.length === 0 && (
             <TableRow>
               <TableCell
