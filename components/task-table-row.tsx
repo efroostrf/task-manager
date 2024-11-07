@@ -3,7 +3,14 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { format } from 'date-fns';
-import { Eye, Pencil, Archive, RotateCcw, Trash2 } from 'lucide-react';
+import {
+  Eye,
+  Pencil,
+  Archive,
+  RotateCcw,
+  Trash2,
+  GripVertical,
+} from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -57,12 +64,24 @@ export function TaskTableRow({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    cursor: 'move',
   };
 
   return (
-    <TableRow ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <TableCell className="font-medium">{task.name}</TableCell>
+    <TableRow ref={setNodeRef} style={style}>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-grab hover:bg-muted active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <span className="font-medium">{task.name}</span>
+        </div>
+      </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
           {project && (
