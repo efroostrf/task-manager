@@ -55,6 +55,7 @@ export function TaskFormDialog({
     defaultValues: {
       projectId: selectedProjectId || '',
       status: 'pending',
+      description: '',
     },
   });
 
@@ -88,17 +89,12 @@ export function TaskFormDialog({
         toast.success('Task updated successfully');
       } else {
         addTask(data);
-        toast.success('Task added successfully');
+        toast.success('Task created successfully');
       }
-      handleClose();
+      onClose();
     } catch (error) {
       toast.error('An error occurred while saving the task');
     }
-  };
-
-  const handleClose = () => {
-    reset();
-    onClose();
   };
 
   return (
@@ -141,14 +137,22 @@ export function TaskFormDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" {...register('name')} />
+            <Input
+              id="name"
+              placeholder="Enter task name"
+              {...register('name')}
+            />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea id="description" {...register('description')} />
+            <Label htmlFor="description">Description (optional)</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter task description (optional)"
+              {...register('description')}
+            />
             {errors.description && (
               <p className="text-sm text-destructive">
                 {errors.description.message}
@@ -183,7 +187,7 @@ export function TaskFormDialog({
             )}
           </div>
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit">

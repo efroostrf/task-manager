@@ -14,7 +14,7 @@ export const taskSchema = z.object({
   id: z.string(),
   projectId: z.string(),
   name: z.string().min(1, 'Name is required'),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().optional().default(''),
   status: z.enum([
     'draft',
     'pending',
