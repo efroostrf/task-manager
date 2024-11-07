@@ -1,4 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
+import { X } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -42,6 +44,7 @@ export function TaskFormDialog({
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'archived'>>({
     resolver: zodResolver(
@@ -56,8 +59,12 @@ export function TaskFormDialog({
       projectId: selectedProjectId || '',
       status: 'pending',
       description: '',
+      deadline: undefined,
     },
   });
+
+  // Watch the deadline value to format it properly
+  const deadlineValue = watch('deadline');
 
   // Update form when dialog opens
   useEffect(() => {
@@ -68,13 +75,15 @@ export function TaskFormDialog({
           description: selectedTask.description,
           status: selectedTask.status,
           projectId: selectedTask.projectId,
+          deadline: selectedTask.deadline ? selectedTask.deadline : undefined,
         });
       } else {
         reset({
           name: '',
           description: '',
-          status: 'pending',
+          status: 'draft',
           projectId: selectedProjectId || '',
+          deadline: undefined,
         });
       }
     }
@@ -183,6 +192,44 @@ export function TaskFormDialog({
             {errors.status && (
               <p className="text-sm text-destructive">
                 {errors.status.message}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="deadline">Deadline (optional)</Label>
+            <div className="flex gap-2">
+              <Input
+                type="datetime-local"
+                id="deadline"
+                {...register('deadline', {
+                  setValueAs: (value: string) =>
+                    value ? new Date(value) : undefined,
+                })}
+                value={
+                  deadlineValue
+                    ? format(
+                        new Date(deadlineValue),
+                        'yyyy-MM-dd_HH:mm',
+                      ).replace('_', 'T')
+                    : ''
+                }
+                onChange={e => {
+                  const { value } = e.target;
+                  setValue('deadline', value ? new Date(value) : undefined);
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setValue('deadline', undefined)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            {errors.deadline && (
+              <p className="text-sm text-destructive">
+                {errors.deadline.message}
               </p>
             )}
           </div>

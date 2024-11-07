@@ -40,6 +40,11 @@ const STATUS_STYLES = {
   cancelled: 'bg-red-100 text-red-800',
 } as const;
 
+const getDeadlineStyle = (deadline: Date | undefined) => {
+  if (!deadline) return 'text-muted-foreground';
+  return deadline < new Date() ? 'text-red-600 font-medium' : 'text-foreground';
+};
+
 export function TaskTableRow({
   task,
   onView,
@@ -90,7 +95,7 @@ export function TaskTableRow({
           {project?.name}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="whitespace-nowrap">
         <span
           className={`inline-block rounded-full px-2 py-1 text-sm capitalize ${
             STATUS_STYLES[task.status]
@@ -99,9 +104,19 @@ export function TaskTableRow({
           {task.status}
         </span>
       </TableCell>
-      <TableCell>{format(task.createdAt, 'PPp')}</TableCell>
-      <TableCell>{format(task.updatedAt, 'PPp')}</TableCell>
-      <TableCell className="text-right">
+      <TableCell className="whitespace-nowrap">
+        {format(task.createdAt, 'PPp')}
+      </TableCell>
+      <TableCell className="whitespace-nowrap">
+        {task.deadline ? (
+          <span className={getDeadlineStyle(task.deadline)}>
+            {format(task.deadline, 'PPp')}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">No deadline</span>
+        )}
+      </TableCell>
+      <TableCell className="flex justify-end gap-1 whitespace-nowrap">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

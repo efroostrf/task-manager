@@ -23,6 +23,7 @@ export const taskSchema = z.object({
     'on-hold',
     'cancelled',
   ]),
+  deadline: z.date().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
   archived: z.boolean(),
@@ -166,6 +167,7 @@ export const useTaskStore = create<TaskStore>()(
             ...task,
             createdAt: new Date(task.createdAt),
             updatedAt: new Date(task.updatedAt),
+            deadline: task.deadline ? new Date(task.deadline) : undefined,
           }));
         }
       },

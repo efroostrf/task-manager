@@ -87,6 +87,14 @@ export function TaskViewDialog({
                   format(selectedTask.updatedAt, 'PPp')}
               </p>
             </div>
+            <div>
+              <h3 className="font-medium">Deadline</h3>
+              <p className="text-muted-foreground">
+                {selectedTask.deadline
+                  ? format(selectedTask.deadline, 'PPp')
+                  : 'No deadline set'}
+              </p>
+            </div>
           </div>
         </div>
       </DialogContent>

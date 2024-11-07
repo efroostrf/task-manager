@@ -74,7 +74,7 @@ export function TaskTable({
             <TableHead>Project</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Created</TableHead>
-            <TableHead>Updated</TableHead>
+            <TableHead>Deadline</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
