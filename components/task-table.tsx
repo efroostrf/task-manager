@@ -1,7 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
-import { Eye, Pencil, Archive, RotateCcw } from 'lucide-react';
+import { Eye, Pencil, Archive, RotateCcw, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +12,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { type Task, useTaskStore } from '@/lib/store';
 
 interface TaskTableProps {
@@ -20,6 +26,7 @@ interface TaskTableProps {
   onEdit: (task: Task) => void;
   onArchive: (id: string) => void;
   onUnarchive?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 const STATUS_STYLES = {
@@ -37,6 +44,7 @@ export function TaskTable({
   onEdit,
   onArchive,
   onUnarchive,
+  onDelete,
 }: TaskTableProps) {
   const projects = useTaskStore(state => state.projects);
 
@@ -81,37 +89,78 @@ export function TaskTable({
                 <TableCell>{format(task.createdAt, 'PPp')}</TableCell>
                 <TableCell>{format(task.updatedAt, 'PPp')}</TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onView(task)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(task)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  {task.archived && onUnarchive ? (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onUnarchive(task.id)}
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onArchive(task.id)}
-                    >
-                      <Archive className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onView(task)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>View task</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEdit(task)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Edit task</TooltipContent>
+                    </Tooltip>
+
+                    {task.archived && onUnarchive ? (
+                      <>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => onUnarchive(task.id)}
+                            >
+                              <RotateCcw className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Restore task</TooltipContent>
+                        </Tooltip>
+
+                        {onDelete && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onDelete(task.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete permanently</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onArchive(task.id)}
+                          >
+                            <Archive className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Archive task</TooltipContent>
+                      </Tooltip>
+                    )}
+                  </TooltipProvider>
                 </TableCell>
               </TableRow>
             );

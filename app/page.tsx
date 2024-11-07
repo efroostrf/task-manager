@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTaskStore, type Task } from '@/lib/store';
 
 export default function Home() {
-  const { tasks, selectedProjectId, archiveTask, unarchiveTask } =
+  const { tasks, selectedProjectId, archiveTask, unarchiveTask, deleteTask } =
     useTaskStore();
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -56,6 +56,11 @@ export default function Home() {
   const handleUnarchive = (id: string) => {
     unarchiveTask(id);
     toast.success('Task restored successfully');
+  };
+
+  const handleDelete = (id: string) => {
+    deleteTask(id);
+    toast.success('Task deleted permanently');
   };
 
   return (
@@ -101,6 +106,7 @@ export default function Home() {
                 onEdit={handleEdit}
                 onArchive={handleArchive}
                 onUnarchive={handleUnarchive}
+                onDelete={handleDelete}
               />
             </TabsContent>
           </Tabs>
